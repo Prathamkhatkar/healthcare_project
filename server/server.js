@@ -6,7 +6,22 @@ const cors = require("cors");
 const userRoutes = require('./routes/userRoutes');
 var hbs = require("hbs")
 const doctorRoutes = require("./routes/doctorRoutes");
+const multer = require('multer')
 
+// disk storage
+const path = require("path");
+const storage = multer.diskStorage({
+    destination: function(req,file,cb){
+        cb(null, path.join(__dirname, '/upload'))
+    },
+    filename: function(req, file, cb){
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, file.fieldname + uniqueSuffix + path.extname(file.originalname))
+    }
+})
+const upload = multer({storage: storage})
+
+  
 //app.use('/api/users', userRoutes);
 
 
@@ -44,7 +59,14 @@ app.get("/allusers",(req,res)=>{
     })
 })
 //hbs.registerPartials(path.join(__dirname, '/views/partials'));
+app.post('/profile', upload.single('avatar'), (req, res, next) => {
 
+
+    console.log(req.body);
+    console.log(req.file);
+
+    res.send('File uploaded successfully!');
+});
 
 
 // APP CONFIG START
